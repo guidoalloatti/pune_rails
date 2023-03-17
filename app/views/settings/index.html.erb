@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pune! Settings - Html5, Canvas, jQuery Game</title>
+    <meta charset="utf-8">
+    <meta content="javascript, game, games, jquery, gamequery, game engine, framework, development" name="keywords">
+    <%= favicon_link_tag "/favicon.gif", type: "image/gif" %>
+    <%= javascript_include_tag "font", "settings" %>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container">
+
+      <%# Hidden inputs %>
+        <% %w(red blue green purple cyan yellow).each do |color| %>
+          <% %w(left right).each do |side| %>
+            <%= hidden_field_tag "#{color}_#{side}_value" %>
+        <% end %>
+      <% end %>
+      
+      <div class="container mt-3">
+        <h3><u>Worms Configuration</u></h3>
+        <br>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Worm</th>
+              <th>Play</th>
+              <th>Left</th>
+              <th>Right</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% %w(red blue green purple cyan yellow).each do |color| %>
+            <tr>
+              <td>
+                <%= text_field_tag "#{color}_label", "#{color.capitalize} Worm", readonly: true, class: "form-control-plaintext", style: "font-size: 12pt; border-radius: 5px; padding-left: 10px; border: none !important;" %>
+              </td>
+              <td align="center">
+                <%= check_box_tag "#{color}_play", nil, false, class: "form-check-input" %>
+              </td>
+              <td align="center">
+                <%= text_field_tag "#{color}_left", nil, size: 1, class: "form-control" %>
+              </td>
+              <td align="center">
+                <%= text_field_tag "#{color}_right", nil, size: 1, class: "form-control" %>
+              </td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
+        
+        <hr>
+        
+        <div>
+          <div>
+            HOLE POINTS:
+            <button type="button" id="hole_points_button" class="btn btn-outline-primary w-150" onclick="toggleHolePoints();" value="0">NONE</button>
+          </div>
+          <div>
+            SPEED:
+            <button type="button" id="speed_button" class="btn btn-outline-success w-150" onclick="toggleSpeed();" value="1">NORMAL</button>
+          </div>
+          <div>
+            GAP SPACING:
+            <button type="button" id="gap_spacing_button" class="btn btn-outline-secondary w-150" onclick="toggleGapSpacing();" value="1">NORMAL</button>
+          </div>
+          <div>
+            GAP SIZE:
+            <button type="button" id="gap_size_button" class="btn btn-outline-info w-150" onclick="toggleGapSize();" value="1">NORMAL</button>
+          </div>
+        </div>
+      </div>
+      <br>
+
+      <div class="form-group">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="save_on_close" name="save_on_close" value="">
+          <label class="form-check-label" for="save_on_close">
+            Start game after save?
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="close_on_save" name="close_on_save" value="">
+          <label class="form-check-label" for="close_on_save">
+            Close windows on save?
+          </label>
+        </div>
+      </div>
+
+      <hr>
+      <div>
+        <button type="button" id="save_settings_butoon" class="btn btn-primary w-150" onclick="saveSettings();" value="0">Save Settings</button>
+      </div>
+
+
+      
+      <!-- Bootstrap JS -->
+      <!-- <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script> -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    </div>
+  </body>
+</html>

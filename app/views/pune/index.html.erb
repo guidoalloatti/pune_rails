@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html> 
+  <head> 
+    <title>Pune! - Html5, Canvas, jQuery Game</title> 
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+    <meta content="javascript, game, games, jquery, gamequery, game engine, framework, development" name="keywords"> 
+    <link rel="icon" href="/favicon.gif" type="image/gif"> 
+		
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="<%= asset_path 'class' %>"></script>
+    <script src="<%= asset_path 'engine' %>"></script>
+    <script src="<%= asset_path 'graphics' %>"></script>
+    <script src="<%= asset_path 'helper' %>"></script>
+    <script src="<%= asset_path 'keys' %>"></script>
+    <script src="<%= asset_path 'renderer' %>"></script>
+    <script src="<%= asset_path 'settings' %>"></script>
+    <script src="<%= asset_path 'sounds' %>"></script>
+    <script src="<%= asset_path 'vars' %>"></script>
+    <script src="<%= asset_path 'worms' %>"></script>
+
+    <%= stylesheet_link_tag "application", "game", "data-turbo-track": "reload" %>
+	</head>
+
+  <body>
+    <div class="container">
+      <div>
+        <div class="row">
+          <div class="col-md-1">
+            <h5>Game ID:</h5>
+          </div>
+          <div class="col" style="text-align: left;">
+            <div id="game_id"><%= @game_id %></div>
+          </div>
+        </div>
+          
+      </div>
+      <div id="canvas_div"> 
+        <table>
+          <tr>
+            <td>
+              <canvas id="screen" width="640" height="480">
+                This text is displayed if our browser does not support HTML5 Canvas.
+              </canvas>
+            </td>
+            <td>
+              <canvas id="marker" width="100" height="480">
+                This text is displayed if our browser does not support HTML5 Canvas.
+              </canvas>
+            </td>
+            <td>
+              <table cellspacing=0 cellpadding=5 width=400 border=0 align="center">
+                <tbody> 
+                  <tr valign=top> 
+                    <td colspan=5></td>
+                    <td bgcolor="#ffcccc" width="54">&nbsp;</td>
+                    <td colspan=2></td>
+                  </tr>
+                  <tr valign=top> 
+                    <td width="6"></td>
+                    <td bgcolor="#88bbbb" width="56">&nbsp;</td>
+                    <td colspan=2></td>
+
+                    <td bgcolor="#cc3333" colspan=2 rowspan=2 class="p-20 custom-textarea"> 
+                      <p>
+                        <font face="Arial, Helvetica, sans-serif" size="2" color="#FFFFFF">
+                          <b>
+                            <font color="#FFCFCE">
+                              Game Handling
+                            </font>
+                          </b>
+                          <hr>
+
+                          <button type="button" id="start_game_button" class="btn btn-success w-150" onclick="startGameNow();">Start Game!</button>
+                          <button type="button" class="btn btn-sm btn-info mt-10 w-150" onclick="settings();">Settings</button>
+                          <!-- <button type="button" class="btn btn-sm btn-secondary mt-10 w-150" onclick="testXML();">Test XLM</button> -->
+                          
+                          <!-- <input id="button" type="button" value="Sound Test [Nasty!]" onclick="playSound('burp');"> -->
+                          
+                          <div class="col pl-10 mt-20">
+                            <div class="form-check">
+                              <label id="pause_label" class="form-check-label" for="flexCheckCheckedPause">
+                                Game is Running
+                              </label>
+                              <input class="form-check-input" type="checkbox" id="flexCheckCheckedPause" onclick="pause();">
+                            </div>
+                          </div>
+
+                          <div class="col pl-10">
+                            <div class="form-check">
+                              <label id="sound_label" class="form-check-label" for="flexCheckCheckedSound">
+                                Sound On
+                              </label>
+                              <input class="form-check-input" type="checkbox" id="flexCheckCheckedSound" checked onclick="soundSwitcher();">
+                            </div>
+                          </div>
+                  
+                        </font>
+                      </p>
+                    </td>
+                    <td bgcolor="#ddaaaa" width="3">&nbsp;</td>
+                    <td></td>
+                  </tr>
+                  <tr valign=top> 
+                    <td bgcolor="#99cccc" width="6">&nbsp;</td>
+                    <td bgcolor="#006666" colspan=2 rowspan=2> 
+                      <p>
+                        <font face="Arial, Helvetica, sans-serif" size="2" color="#8CBABD">
+                          <b>Moving Worms!</b>
+                        </font>
+                        <hr>
+                        <font face="Arial, Helvetica, sans-serif" size="2" color="#FFFFFF">
+                          Worm . . . . . . . Left . . Right
+                          <textarea id="howto" class="default-textarea" name="howto" rows="6" cols="8" readonly></textarea>
+                          <textarea id="howto1" class="default-textarea" name="howto1" rows="6" cols="1" readonly></textarea>
+                          <textarea id="howto2" class="default-textarea" name="howto2" rows="6" cols="1" readonly></textarea>
+                        </font></p>
+                      </td>
+                      <td width="20">
+                        <%= image_tag('worm.png') %>
+                      </td>
+                      <td colspan=2 rowspan=2>&nbsp;</td>
+                    </tr>
+                    <tr valign=top> 
+                      <td width="6"></td>
+                      <td bgcolor="#254D78" colspan=3 rowspan=3> 
+                        <p align="center"><font face="Arial, Helvetica, sans-serif" color="#FFFFFF" size="+3"><b><font size="+2">Sounds<br/>Game & Worms!</font></b></font></p>
+                        <p align="center"><font face="Arial, Helvetica, sans-serif" size="3"><b><font color="#A5C5E2"></font></b></font></p>
+                        
+                        <table>
+                          <tr>
+                            <% @actions.each do |action| %>
+                            <td id="<%= action %>" class="color-td" onclick="playSound('<%= action %>')">
+                              <%= action.capitalize %>
+                              <audio id="sound_<%= action %>" muted></audio> 
+                            </td>
+                            <% end %>
+                          </tr>     
+                          
+                          <tr>
+                            <% @colors.each do |color| %>
+                            <td id="<%= color %>" bgcolor="<%= color %>" class="color-td" onclick="playSound('<%= color %>')">
+                              <%= color.capitalize %>
+                              <audio id="sound_<%= color %>" muted></audio> 
+                            </td>
+                            <% end %>
+                            
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr valign=top> 
+                      <td colspan=2></td>
+                      <td bgcolor="#77aaaa" width="54">&nbsp;</td>
+                      <td bgcolor="#B9D3EC" colspan=2 rowspan=2>&nbsp;</td>
+                    </tr>
+                    <tr valign=top> 
+                      <td width="6">&nbsp;</td>
+                      <td bgcolor="#FFCF63" colspan=2 rowspan=4> 
+                        <p>
+                          <font face="Arial, Helvetica, sans-serif" size="2" color="#FFF4DF">
+                            <font color="#FFF5DF">
+                              <b>Game Log</b>
+                            </font>
+                            <hr>
+                          </font>
+                          <font face="Arial, Helvetica, sans-serif" size="2">
+                            <textarea id="log" class="default-textarea" name="log" rows="14" cols="24" readonly></textarea>
+                          </font>
+                        </p>
+                      </td>
+                    </tr>
+                    <tr valign=top> 
+                      <td bgcolor="#FFE3AD" width="6" rowspan="3">&nbsp;</td>
+                      <td rowspan=3 width="20"> 
+                        <p>&nbsp;</p>
+                      </td>
+                      <td width="12" bgcolor="#BDD3EF"></td>
+                      <td colspan=4 bgcolor="purple" rowspan=3>
+                        <font face="Arial, Helvetica, sans-serif" size="2" color="#BDD3EF">
+                          <b>Speed, Round & Longest Worm</b>
+                        </font>
+                        <hr>
+                        <font face="Arial, Helvetica, sans-serif" size="2">
+                          <font color="#FFFFFF">
+                            <input type="label" id="speed" readonly/>
+                            <hr/>
+                            <input type="label" id="rounds" readonly/>
+                            <hr/>
+                            <input type="label" id="longest" readonly/>
+                            <input type="label" id="longest_size" readonly/>
+                          </font>
+                        </font>
+                      </td>
+                    </tr>
+                    <tr valign=top> 
+                      <td width="1" bgcolor="#BDD3EF">&nbsp;</td>
+                    </tr>
+                    <tr valign=top> 
+                      <td width="1">&nbsp;</td>
+                    </tr>
+                  </tbody> 
+                </table>
+              </td>
+            </tr>
+          </table>
+      </div>
+    </div>
+  </body>
+</html>
