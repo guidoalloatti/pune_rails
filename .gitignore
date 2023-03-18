@@ -9,6 +9,7 @@
 /test/tmp/
 /test/version_tmp/
 /tmp/
+tmp/cache/
 
 # Used by dotenv library to load environment variables.
 # .env
@@ -58,3 +59,4 @@ build-iPhoneSimulator/
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 /log/development.log
+log/development.log
