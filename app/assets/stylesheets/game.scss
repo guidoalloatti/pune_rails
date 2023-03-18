@@ -11,6 +11,27 @@
     font-family: Tahoma, sans-serif;
 }
 
+.volume-area {
+    display: flex;
+    margin-top: 10px;
+    background: white;
+    color: black;
+    padding: 5px 0 !important;
+    border-radius: 5px;
+    text-align: center;
+    border: 1px solid darkred;
+    box-shadow: 1px 1px 10px 5px #5b1112;
+    font-weight: 600;
+}
+
+#video {
+    transform: scaleX(-1);
+    object-fit: contain;
+}
+
+.w-25 { width: 25px; }
+.w-30 { width: 30px !important; }
+.w-50 { width: 50px !important; }
 .w-100 { width: 100px; }
 .w-150 { width: 150px; }
 .w-200 { width: 200px; }
@@ -19,7 +40,12 @@
 .pl-10 { padding-left: 10px; }
 .p-20 { padding: 20px; }
 
+.ml-5 { margin-left: 5px; }
 .ml-10 { margin-left: 10px; }
+
+.mt-5 { margin-top: 5px !important; }
 .mt-10 { margin-top: 10px; }
 .mt-20 { margin-top: 20px; }
+
+.mb-0 { margin-bottom: 0;}
 

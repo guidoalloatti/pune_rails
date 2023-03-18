@@ -16,6 +16,7 @@
     <script src="<%= asset_path 'settings' %>"></script>
     <script src="<%= asset_path 'sounds' %>"></script>
     <script src="<%= asset_path 'vars' %>"></script>
+    <!-- <script src="<%= asset_path 'video' %>"></script> -->
     <script src="<%= asset_path 'worms' %>"></script>
 
     <%= stylesheet_link_tag "application", "game", "data-turbo-track": "reload" %>
@@ -23,6 +24,29 @@
 
   <body>
     <div class="container">
+      
+    <!--
+      <br>
+      <hr>
+      <br>
+
+      <video id="video" autoplay></video>
+
+      <label for="resolution">Resolution:</label>
+      <select id="resolution">
+        <option value="default">Default</option>
+        <option value="ld">LD (800x600)</option>
+        <option value="lld">LLD (640x480)</option>
+        <option value="hd">HD (1280x720)</option>
+        <option value="fullhd">Full HD (1920x1080)</option>
+        <option value="4k">4K (4096x2160)</option>
+      </select>
+
+      <br>
+      <hr>
+      <br>
+    -->
+      
       <div>
         <div class="row">
           <div class="col-md-1">
@@ -71,9 +95,8 @@
                           <hr>
 
                           <button type="button" id="start_game_button" class="btn btn-success w-150" onclick="startGameNow();">Start Game!</button>
-                          <button type="button" class="btn btn-sm btn-info mt-10 w-150" onclick="settings();">Settings</button>
+                          <button type="button" class="btn btn-sm btn-primary mt-10 w-150" onclick="settings();">Settings</button>
                           <!-- <button type="button" class="btn btn-sm btn-secondary mt-10 w-150" onclick="testXML();">Test XLM</button> -->
-                          
                           <!-- <input id="button" type="button" value="Sound Test [Nasty!]" onclick="playSound('burp');"> -->
                           
                           <div class="col pl-10 mt-20">
@@ -91,6 +114,18 @@
                                 Sound On
                               </label>
                               <input class="form-check-input" type="checkbox" id="flexCheckCheckedSound" checked onclick="soundSwitcher();">
+                            </div>
+                          </div>
+
+                          <div class="volume-area">
+                            <div class="col-md-3">
+                              <button type="button" class="btn btn-sm btn-secondary w-30 mt-5" onclick="volumeDown();">-</button>
+                            </div>
+                            <div class="col-md-6">
+                              Volume: <div id="volume"></div>
+                            </div>
+                            <div class="col-md-3">
+                              <button type="button" class="btn btn-sm btn-dark w-30 mt-5" onclick="volumeUp();">+</button>
                             </div>
                           </div>
                   

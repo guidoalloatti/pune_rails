@@ -1,3 +1,5 @@
+var settings_saved = {}
+
 function labelClicked(color, caller) {
 	var play = $("#" + color + "_play");
 	var label = $("#" + color + "_label");
@@ -57,15 +59,7 @@ window.onload = function() {
 	$("#cyan_left").keypress(function(e)	{	setMoveKey("cyan", "left", event.keyCode, event.charCode); 		});
 	$("#cyan_right").keypress(function(e)	{	setMoveKey("cyan", "right", event.keyCode, event.charCode); 	});
 	$("#yellow_left").keypress(function(e)	{	setMoveKey("yellow", "left", event.keyCode, event.charCode); 	});
-	$("#yellow_right").keypress(function(e)	{	setMoveKey("yellow", "right", event.keyCode, event.charCode); 	});
-	
-	/*
-	$("input:hidden").each(function(i) {
-		this.id = this.id + "_" + i;
-		alert(this.id);
-    });
-	*/
-	
+	$("#yellow_right").keypress(function(e)	{	setMoveKey("yellow", "right", event.keyCode, event.charCode); 	});	
 };
 
 function setMoveKey(color, direction, keyCode, charCode) {
@@ -113,12 +107,31 @@ function settings() {
 	options += "height=920, ";
 	options += "width=640";
 
-	$("#log").text($("#log").text()+"\nGame Settings Launched!");
-	window.open("settings?game_id=" + game_id , "Settings Window", options);
+    addToLog("Game Settings Launched!")
+    addToLog(".");
+
+    var settings = window.open("settings?game_id=" + game_id , "Settings Window", options);
+    
+    var settingsTimer = 0;
+    var popupTick = setInterval(function() {
+        if (settings.closed) {
+            clearInterval(popupTick);
+            addToLog("Game Settings Closed!");
+            setupCompleted = true;
+            checkGameSet();
+        } else {
+            settingsTimer += 1;
+            replaceLastLogLine("Game Settings opened for: " + settingsTimer + " seconds.");
+            setupCompleted = false;
+            checkGameSet();
+      }
+    }, 1000);
+    return false;
+
 }
 
 function saveSettings() {
-	var settings = {
+	settings_saved = {
 		worms: {
 			red: { play: $("#red_play").is(':checked'), left: $("#red_left").val(), right: $("#red_right").val() },
 			blue: { play: $("#blue_play").is(':checked'), left: $("#blue_left").val(), right: $("#blue_right").val() },
@@ -138,7 +151,7 @@ function saveSettings() {
 
 	$.ajax({
 		url: "/settings/save",
-		data: {"settings": settings},
+		data: {"settings": settings_saved},
 		type: "POST",
 		success: function (data) {
 			if($("#close_on_save").is(':checked')) window.close()
@@ -265,3 +278,15 @@ function getSearchParams(k){
 	location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi,function(s,k,v){p[k]=v})
 	return k?p[k]:p;
 };
+
+function replaceLastLogLine(text) {   
+    var log = $('#log');
+    var value_list = $("#log").val().split("\n");
+    value_list.pop();
+    value_list.push(text);
+    log.text(value_list.join("\n"));
+}
+
+function addToLog(text) {
+    $("#log").text($("#log").text() +  "\n" + text);
+}

@@ -2,26 +2,59 @@
 var colorMatrix = new Array();
 var players = new Array();
 var gameInProgress = false;
-
+var setupCompleted = false;
 
 /**
  * Starting the Game when page is Ready
  */
-// $(document).ready(function()
-// {
-// 	// startGame();
-// });
+window.onload = function() {
+	updateVolumeInput()
+	checkGameSet();
+}
 
+function gameSet() {
+	console.log("Let's set all!");
+
+	// getSettings();
+	// console.log(settings_saved);
+	// setArrays();
+
+	fetchSettings();
+}
+
+function fetchSettings() {
+	var game_id = $("#game_id").text();
+
+	$.ajax({
+		url: "/settings/fetch",
+		data: {"game_id": game_id},
+		type: "POST",
+		success: function (data) {
+			// populateSettings(data);
+			console.log(data);
+		}
+	});
+}
+
+function checkGameSet() {
+	if(setupCompleted) { 
+		message = "Start Game!";
+		gameSet();
+	}
+	else message = "Please setup the game!"
+
+	$("#start_game_button").prop("disabled", !setupCompleted);
+	$("#start_game_button").text(message);
+}
 
 function startGameNow() {
-	$("#start_game_button").prop("disabled", true);
-	$("#start_game_button").text("Game Started...");
-
-	if(!gameInProgress) {
-		// console.log("HOT HERE!"); 
+	if(gameInProgress) {
+		$("#start_game_button").prop("disabled", true);
+		$("#start_game_button").text("Game Started!");
+	} else {
 		gameInProgress = true;
 		startGame();
-		$("#log").text($("#log").text()+"\nNew Game Started!");
+		addToLog("New Game Started!")
 	}
 }
 
@@ -32,8 +65,7 @@ function startGameNow() {
 	context = loadCanvasContext();
 	marker = loadMarkerCanvas();
 
-	if(context && marker)
-	{
+	if(context && marker) {
 		setArrays();
 		isNewRound = false;
 		start();
@@ -44,9 +76,7 @@ function startGameNow() {
 		speed = startingSpeed;
 		$("#rounds").text("1");
 		changeInterval(speed);
-	}
-	else
-	{
+	} else {
 		alert("Cannot Load Canvas");
 	}
 }
@@ -54,8 +84,7 @@ function startGameNow() {
 /**
  * This Function Shows how to move (should be shown from the XML)
  */
-function explainHowToMove()
-{
+function explainHowToMove() {
 	message += "Red";
 	message += "\nBlue";
 	message += "\nGreen";
@@ -68,8 +97,7 @@ function explainHowToMove()
 /**
  * Function that modify the angle of the moving worm
  */
- function changeAngle(direction, currentWorm)
-{
+ function changeAngle(direction, currentWorm) {
 	if(direction == "left")
 	{
 		if((currentWorm.angle-angleStepSize) <= 0)
@@ -86,8 +114,7 @@ function explainHowToMove()
 }
 
 // Setting Worms Arrays (should be from XML)
-function setArrays()
-{
+function setArrays() {
 	// Who is playing
 	players[0] = true;
 	players[1] = true;
@@ -125,8 +152,7 @@ function worm()
 */
 
 // Starting the contexts, set speeding and start Worms
-function start()
-{
+function start() {
 	setContextProperties();
 	setMarkerProperties();
 	context.fillRect(0, 0, xMax, yMax);
@@ -137,19 +163,15 @@ function start()
 }
 
 // Start each individual Worm
-function startWorms()
-{
-	for(var i = 0; i < colors.length; i++)
-	{
-		if(players[i])
-			startWorm(colors[i]);
+function startWorms() {
+	for(var i = 0; i < colors.length; i++) {
+		if(players[i]) startWorm(colors[i]);
 	}
 	drawScore();
 }
 
 // Start a worm each round
-function startWorm(color)
-{
+function startWorm(color) {
 	// TODO: Limit the place and border proximity to avoid fast death
 	// Getting Random Postitions and Angle
 	x = Math.floor(Math.random()*xMax);
@@ -175,8 +197,7 @@ function startWorm(color)
 }
 
 // This function gets the worm who is winning with it size
-function getLongestWorm()
-{
+function getLongestWorm() {
 	longestWormSize = 0;
 	longestWorm = "";
 	
@@ -196,16 +217,14 @@ function getLongestWorm()
 }
 
 // Set Time interval (must not exists any more when render will be implemented)
-function changeInterval(speed)
-{
+function changeInterval(speed) {
 	fps = speed+basicFPSValue;
 	clearInterval(interval);
 	interval = setInterval(moveWorms, intervalMiliSeconds/fps);
 }
 
 // This function do the real speeding
-function doSpeeding()
-{
+function doSpeeding() {
 	playSound("speeding");
 	speed += speedingIncrementSpeed;
 	changeInterval(speed);
@@ -213,8 +232,7 @@ function doSpeeding()
 }
 
 // This function evaluates and if random numbers matchs speeds
-function speeding()
-{
+function speeding() {
 	random_1 = Math.floor(Math.random()*(speedingChance+speed));
 	random_2 = (speedingChance+speed) - Math.floor(Math.random()*(speedingChance+speed));
 	if(random_1 == random_2)
@@ -222,8 +240,7 @@ function speeding()
 }
 
 // This function move each worm and is called in the time interval
-function moveWorms()
-{
+function moveWorms() {
 	if(onPause)
 		return;
 	
@@ -238,8 +255,7 @@ function moveWorms()
 } 
 
 // Add the score to all non dead worms
-function addScore()
-{
+function addScore() {
 	for(var i = 0; i < worms.length; i++)
 	{
 		if(players[i] && worms[i].alive)
@@ -248,8 +264,7 @@ function addScore()
 }
 
 // Determines wich worms are alive
-function getWormsAlive()
-{
+function getWormsAlive() {
 	wormsAlive = 0;
 	for(var i = 0; i < worms.length; i++)
 	{
@@ -259,8 +274,7 @@ function getWormsAlive()
 }
 
 // Get the highest Score and the Winning Worm
-function getMaxScore()
-{
+function getMaxScore() {
 	maxScore = 0;
 	for(var i = 0; i < worms.length; i++)
 	{
@@ -274,8 +288,7 @@ function getMaxScore()
 }
 
 // Get the score needed to win the match
-function getScoreToWin()
-{
+function getScoreToWin() {
 	scoreToWin = -10;
 	for(var i = 0; i < worms.length; i++)
 	{
@@ -285,8 +298,7 @@ function getScoreToWin()
 }
 
 // Calculates if the worm crush with other worm, also play yabass if passed through a hole
-function isWormHit(currentWorm)
-{
+function isWormHit(currentWorm) {
 	radians = currentWorm.angle*(Math.PI/180);
 	sin = Math.sin(radians*sizeMultiplier);
 	cos = Math.cos(radians*sizeMultiplier);
@@ -334,8 +346,7 @@ function moveWorm(currentWorm) {
 }	
 
 // The worm has not crush and can move
-function wormIsAlive(currentWorm)
-{
+function wormIsAlive(currentWorm) {
 	radians = currentWorm.angle*(Math.PI/180);
 	sin = Math.sin(radians*sizeMultiplier);
 	cos = Math.cos(radians*sizeMultiplier);
@@ -346,8 +357,7 @@ function wormIsAlive(currentWorm)
 }
 	
 // The worm is dead, so we need to kill her	
-function wormCrushes(currentWorm)
-{
+function wormCrushes(currentWorm) {
 	playSound("die");
 	
 	//speed = startingSpeed;
@@ -372,8 +382,7 @@ function wormCrushes(currentWorm)
 }
 			
 // The last worm is dead, needs to start a new round and maybe a new match
-function lastWormCrushes(currentWorm)
-{
+function lastWormCrushes(currentWorm) {
 	clearKeys();
 	getMaxScore();
 	getScoreToWin();
@@ -386,8 +395,7 @@ function lastWormCrushes(currentWorm)
 }
 
 // This function is called when the match is over				
-function matchOver(currentWorm)
-{
+function matchOver(currentWorm) {
 	playSound("win");
 	currentRound = 0;
 	isNewRound = false;
@@ -396,8 +404,7 @@ function matchOver(currentWorm)
 }
 
 // This function is called when the round is over
-function roundOver(currentWorm)
-{
+function roundOver(currentWorm) {
 	yMarker = 0;
 	if(winningWorm == 0) 
 		playSound("red");
@@ -416,7 +423,6 @@ function roundOver(currentWorm)
 
 // This function stores the previuos coordinates of ther worms
 function storePreviuosCoordinates(currentWorm) {
-
 	if(!currentWorm) return; 
 	if(!currentWorm.previousX) return;
 	if(!currentWorm.previousY) return;
@@ -432,8 +438,7 @@ function storePreviuosCoordinates(currentWorm) {
 }
 
 // Stablish if the worm should a hole
-function isHole(currentWorm)
-{
+function isHole(currentWorm) {
 	var module = currentWorm.length%(holeSize+spaceBetweenHoles);
 	if(module <= holeSize)
 		return true;
@@ -441,10 +446,8 @@ function isHole(currentWorm)
 }
 
 // Gets the worm index by the color
-function getWormIndexByColor(color)
-{
-	switch(color)
-	{
+function getWormIndexByColor(color) {
+	switch(color) {
 		case "red":
 			return 0;
 			break;
@@ -470,10 +473,8 @@ function getWormIndexByColor(color)
 }
 
 // This function adds a message to different textareas
-function addMessage(message, id)
-{
-	switch (id)
-	{
+function addMessage(message, id) {
+	switch (id) {
 		case "howto":
 			$("#howto").text(message);
 			break;
@@ -584,7 +585,7 @@ function pause(setCheckbox = false) {
 	if(onPause) pauseText = "Game is Paused";
 
 	$("#pause_label").text(pauseText);
-	$("#log").text($("#log").text() + "\n" + pauseText);
+	addToLog(pauseText);
 
 	if(setCheckbox) {
 		$('#flexCheckCheckedPause').prop('checked', onPause);

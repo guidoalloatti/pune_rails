@@ -3,6 +3,38 @@
 */
 
 var soundOn = true;
+var currentVolume = 50;
+
+// window.onload = function() {
+// }
+
+function updateVolumeInput() {
+	$("#volume").text(currentVolume + "%");
+	var all_sounds = $('[id^="sound_"]');
+	all_sounds.each(function(i, obj) {
+		var sound = document.getElementById(obj.id);
+		sound.volume = (currentVolume/100);
+	});
+}
+
+function volumeUp() {
+	if(currentVolume >= 100) {
+		addToLog("Max Volume! " + currentVolume);
+	} else {
+		currentVolume += 10;		
+	}
+	updateVolumeInput();
+}
+
+function volumeDown() {
+	if(currentVolume <= 0) {
+		addToLog("Min Volume! " + currentVolume);
+	} else {
+		currentVolume -= 10;
+	}
+	updateVolumeInput();
+}
+
 
 function soundSwitcher() {
 	var sound = "Sound Off";
@@ -10,7 +42,7 @@ function soundSwitcher() {
 	if(soundOn) sound = "Sound On"
 
 	$("#sound_label").text(sound);
-	$("#log").text($("#log").text()+"\nSound Toggled: " + sound);
+	addToLog("Sound Toggled: " + sound);
 }
 
 function playSound(action) {
@@ -53,3 +85,4 @@ function getHexColor(colorStr) {
     document.body.removeChild(a);
     return (colors.length >= 3) ? '#' + (((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).substr(1)) : false;
 }
+
