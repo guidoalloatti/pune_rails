@@ -61,4 +61,4 @@ build-iPhoneSimulator/
 /log/development.log
 log/development.log
 development.log
-server.pid
+tmp/pids/server.pid
