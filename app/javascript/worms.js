@@ -31,7 +31,7 @@ function fetchSettings() {
 		type: "POST",
 		success: function (data) {
 			// populateSettings(data);
-			console.log(data);
+			explainHowToMove(data);
 		}
 	});
 }
@@ -72,7 +72,6 @@ function startGameNow() {
 		setRound();
 		doSpeeding();
 		isNewRound = true;
-		explainHowToMove();
 		speed = startingSpeed;
 		$("#rounds").text("1");
 		changeInterval(speed);
@@ -84,14 +83,19 @@ function startGameNow() {
 /**
  * This Function Shows how to move (should be shown from the XML)
  */
-function explainHowToMove() {
-	message += "Red";
-	message += "\nBlue";
-	message += "\nGreen";
-	message += "\nPurple";
-	message += "\nCyan";
-	message += "\nYellow";
-	addMessage(message, "howto");
+function explainHowToMove(data) {
+	$("#how_to_move_tbody").empty();
+
+	["red", "blue", "green", "purple", "yellow", "cyan"].forEach(function(color) {
+		if(data[color + "_play"]) {
+			$("#how_to_move_tbody").append(
+			"<tr>" +
+				"<td class='capitalize'>" + color + "</td>" +
+				"<td>" + data[color + "_left"] + "</td>" +
+				"<td>" + data[color + "_right"] + "</td>" +
+			"</tr>"
+		)};
+	});
 }
 
 /**
@@ -474,23 +478,25 @@ function getWormIndexByColor(color) {
 
 // This function adds a message to different textareas
 function addMessage(message, id) {
-	switch (id) {
-		case "howto":
-			$("#howto").text(message);
-			break;
-		case "speed":
-			$("#speed").val(message);
-			break;
-		case "rounds":
-			$("#rounds").val(message);	
-			break;
-		case "longest":
-			$("#longest").val(message);
-			break;
-		case "longest_size":
-			$("#longest_size").val(message);
-			break;
-	}
+	$("#" + id).val(message);
+
+	// switch (id) {
+	// 	case "howto":
+	// 		$("#howto").text(message);
+	// 		break;
+	// 	case "speed":
+	// 		$("#speed").val(message);
+	// 		break;
+	// 	case "rounds":
+	// 		$("#rounds").val(message);	
+	// 		break;
+	// 	case "longest":
+	// 		$("#longest").val(message);
+	// 		break;
+	// 	case "longest_size":
+	// 		$("#longest_size").val(message);
+	// 		break;
+	// }
 }
 
 // This function shows the current worm info

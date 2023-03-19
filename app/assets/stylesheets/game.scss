@@ -29,6 +29,10 @@
     object-fit: contain;
 }
 
+.capitalize {
+    text-transform:capitalize;
+}
+
 .w-25 { width: 25px; }
 .w-30 { width: 30px !important; }
 .w-50 { width: 50px !important; }
@@ -36,6 +40,7 @@
 .w-150 { width: 150px; }
 .w-200 { width: 200px; }
 
+.p-5 { padding: 5px !important; }
 .p-10 { padding: 10px; }
 .pl-10 { padding-left: 10px; }
 .p-20 { padding: 20px; }

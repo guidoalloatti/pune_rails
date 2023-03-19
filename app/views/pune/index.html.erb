@@ -4,10 +4,10 @@
     <title>Pune! - Html5, Canvas, jQuery Game</title> 
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
     <meta content="javascript, game, games, jquery, gamequery, game engine, framework, development" name="keywords"> 
-    <link rel="icon" href="/favicon.gif" type="image/gif"> 
+    <!-- <link rel="icon" href="/favicon.gif" type="image/gif">  -->
 		
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="<%= asset_path 'class' %>"></script>
+    <!-- <script src="<%= asset_path 'class' %>"></script>
     <script src="<%= asset_path 'engine' %>"></script>
     <script src="<%= asset_path 'graphics' %>"></script>
     <script src="<%= asset_path 'helper' %>"></script>
@@ -15,10 +15,11 @@
     <script src="<%= asset_path 'renderer' %>"></script>
     <script src="<%= asset_path 'settings' %>"></script>
     <script src="<%= asset_path 'sounds' %>"></script>
-    <script src="<%= asset_path 'vars' %>"></script>
+    <script src="<%= asset_path 'vars' %>"></script> -->
     <!-- <script src="<%= asset_path 'video' %>"></script> -->
-    <script src="<%= asset_path 'worms' %>"></script>
+    <!-- <script src="<%= asset_path 'worms' %>"></script> -->
 
+    <%= javascript_include_tag 'class', 'engine', 'graphics', 'helper', 'keys', 'renderer', 'settings', 'sounds', 'vars', 'worms' %>
     <%= stylesheet_link_tag "application", "game", "data-turbo-track": "reload" %>
 	</head>
 
@@ -140,14 +141,22 @@
                     <td bgcolor="#006666" colspan=2 rowspan=2> 
                       <p>
                         <font face="Arial, Helvetica, sans-serif" size="2" color="#8CBABD">
-                          <b>Moving Worms!</b>
+                          <b>How do I move my worm?</b>
                         </font>
                         <hr>
                         <font face="Arial, Helvetica, sans-serif" size="2" color="#FFFFFF">
-                          Worm . . . . . . . Left . . Right
-                          <textarea id="howto" class="default-textarea" name="howto" rows="6" cols="8" readonly></textarea>
-                          <textarea id="howto1" class="default-textarea" name="howto1" rows="6" cols="1" readonly></textarea>
-                          <textarea id="howto2" class="default-textarea" name="howto2" rows="6" cols="1" readonly></textarea>
+                          <div class="table-responsive">
+                            <table class="table table-dark table-striped">
+                              <thead>
+                                <tr>
+                                  <th>Worm Color</th>
+                                  <th>Left</th>
+                                  <th>Right</th>
+                                </tr>
+                              </thead>
+                            <tbody id="how_to_move_tbody"></tbody>
+                          </table>
+                        </div>
                         </font></p>
                       </td>
                       <td width="20">
