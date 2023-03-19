@@ -70,14 +70,14 @@ var colors = new Array(6);
 var rgbColors = new Array(6);
 
 /* XML Settings */
-var xmlFileDir = "/xml";
-var xmlFileName = "xml_jquery.xml"
+// var xmlFileDir = "/xml";
+// var xmlFileName = "xml_jquery.xml"
 //var xmlFileName = "config.xml"
 
 /**
  * Global variables that will be moved to vars.js
  */
-var playingWorms = new Array({color : "red", 	active : true},
+var playingWorms = new Array({color : "red", 	active : false},
 							 {color : "blue",	active : false},
 							 {color : "green",	active : false},
 							 {color : "purple",	active : false},

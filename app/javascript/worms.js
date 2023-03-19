@@ -1,8 +1,18 @@
 
-var colorMatrix = new Array();
+// var colorMatrix = new Array();
 var players = new Array();
 var gameInProgress = false;
 var setupCompleted = false;
+var colorsArray = ["red", "blue", "green", "yellow", "purple", "cyan"];
+var playingWorms = {};
+var currentWorm;
+
+var wormRed;
+var wormBlue;
+var wormGreen;
+var wormYellow;
+var wormPurple;
+var wormCyan;
 
 /**
  * Starting the Game when page is Ready
@@ -12,14 +22,15 @@ window.onload = function() {
 	checkGameSet();
 }
 
-function gameSet() {
-	console.log("Let's set all!");
+function checkGameSet() {
+	if(setupCompleted) { 
+		message = "Start Game!";
+		fetchSettings();
+	}
+	else message = "Please setup the game!"
 
-	// getSettings();
-	// console.log(settings_saved);
-	// setArrays();
-
-	fetchSettings();
+	$("#start_game_button").prop("disabled", !setupCompleted);
+	$("#start_game_button").text(message);
 }
 
 function fetchSettings() {
@@ -30,22 +41,65 @@ function fetchSettings() {
 		data: {"game_id": game_id},
 		type: "POST",
 		success: function (data) {
-			// populateSettings(data);
 			explainHowToMove(data);
+			setArrays(data);
 		}
 	});
 }
 
-function checkGameSet() {
-	if(setupCompleted) { 
-		message = "Start Game!";
-		gameSet();
-	}
-	else message = "Please setup the game!"
+function explainHowToMove(data) {
+	$("#how_to_move_tbody").empty();
 
-	$("#start_game_button").prop("disabled", !setupCompleted);
-	$("#start_game_button").text(message);
+	colorsArray.forEach(function(color) {
+		if(data[color + "_play"]) {
+			$("#how_to_move_tbody").append(
+			"<tr>" +
+				"<td class='capitalize'>" + color + "</td>" +
+				"<td>" + data[color + "_left"] + "</td>" +
+				"<td>" + data[color + "_right"] + "</td>" +
+			"</tr>"
+		)};
+	});
 }
+
+function setArrays(data) {
+	// Who is playing
+	players[0] = data["red_play"];
+	players[1] = data["blue_play"];
+	players[2] = data["green_play"];
+	players[3] = data["yellow_play"];
+	players[4] = data["purple_play"];
+	players[5] = data["cyan_play"];
+	
+	// Which are they colors
+	colors[0] = "red"; 
+	colors[1] = "blue"; 
+	colors[2] = "green";
+	colors[3] = "yellow";
+	colors[4] = "purple";
+	colors[5] = "cyan";
+
+	// Set Playing Worms
+	playingWorms = {
+		'red'	: data["red_play"],
+		'blue'	: data["blue_play"],
+		'green'	: data["green_play"],
+		'yellow': data["yellow_play"],
+		'purple': data["purple_play"],
+		'cyan'	: data["cyan_play"],
+	};
+
+	// Set Worms Array and Keys
+	for(var i = 0; i < worms.length; i++) {
+		if(players[i]) { 
+			worms[i] = new Worm(colors[i]);
+			wormsKeys[colors[i]]['left'] = keyMapping[data[colors[i] + "_left"]];
+			wormsKeys[colors[i]]['right'] = keyMapping[data[colors[i] + "_right"]];
+		}
+	}
+
+}
+
 
 function startGameNow() {
 	if(gameInProgress) {
@@ -58,119 +112,75 @@ function startGameNow() {
 	}
 }
 
-/**
- * The Function that starts the game including canvas and game
- */
- function startGame() {
+function startGame() {
 	context = loadCanvasContext();
 	marker = loadMarkerCanvas();
 
 	if(context && marker) {
-		setArrays();
 		isNewRound = false;
+		speed = startingSpeed;
+		isNewRound = true;
+
 		start();
 		setRound();
 		doSpeeding();
-		isNewRound = true;
-		speed = startingSpeed;
+
 		$("#rounds").text("1");
+		$("#speed").text("Current Speed: " + speed);
+
 		changeInterval(speed);
 	} else {
 		alert("Cannot Load Canvas");
 	}
 }
 
-/**
- * This Function Shows how to move (should be shown from the XML)
- */
-function explainHowToMove(data) {
-	$("#how_to_move_tbody").empty();
+// Starting the contexts, set speeding and start Worms
+function start() {
+	setContextProperties();
+	setMarkerProperties();
 
-	["red", "blue", "green", "purple", "yellow", "cyan"].forEach(function(color) {
-		if(data[color + "_play"]) {
-			$("#how_to_move_tbody").append(
-			"<tr>" +
-				"<td class='capitalize'>" + color + "</td>" +
-				"<td>" + data[color + "_left"] + "</td>" +
-				"<td>" + data[color + "_right"] + "</td>" +
-			"</tr>"
-		)};
-	});
+	context.fillRect(0, 0, xMax, yMax);
+	marker.fillRect(xMax, 0, xMax+100, yMax);
+	
+	drawMarkers();
+	startWorms();
 }
 
-/**
- * Function that modify the angle of the moving worm
- */
- function changeAngle(direction, currentWorm) {
-	if(direction == "left")
-	{
+function changeAngle(direction, currentWorm) {
+	if(direction == "left")	{
 		if((currentWorm.angle-angleStepSize) <= 0)
-			currentWorm.angle = angleMax+(currentWorm.angle);
+			currentWorm.angle = angleMax + (currentWorm.angle);
 			currentWorm.angle-=angleStepSize; 
 	}
-	else if(direction == "right")
-	{
-		if((currentWorm.angle+angleStepSize) >= angleMax)
+	else if(direction == "right") {
+		if((currentWorm.angle + angleStepSize) >= angleMax)
 			currentWorm.angle = 0-(angleMax-currentWorm.angle);
 			currentWorm.angle+=angleStepSize;
 	}
 	return currentWorm;
 }
 
-// Setting Worms Arrays (should be from XML)
-function setArrays() {
-	// Who is playing
-	players[0] = true;
-	players[1] = true;
-	players[2] = false; //true;
-	players[3] = false; //true;
-	players[4] = false;	//true;
-	players[5] = false; //true;
-	
-	// Which are they colors
-	colors[0] = "red"; 
-	colors[1] = "blue"; 
-	colors[2] = "green";
-	colors[3] = "purple";
-	colors[4] = "cyan";
-	colors[5] = "yellow";
-}
-
 // Worm Object Definition
-/*
-function worm()
-{
-	this.color;
-	this.x;
-    this.y;
-	this.previousX 		= new Array(histotyDotsSaved);
-	this.previousY 		= new Array(histotyDotsSaved);
-	this.previousHole 	= new Array(histotyDotsSaved);
-	this.angle;
-	this.alive = true;
-	this.playing = false;
-	this.score = 0;
-	this.length = 0;
-	this.lastHoleStarted = 0;
-}
-*/
-
-// Starting the contexts, set speeding and start Worms
-function start() {
-	setContextProperties();
-	setMarkerProperties();
-	context.fillRect(0, 0, xMax, yMax);
-	marker.fillRect(xMax, 0, xMax+100, yMax);
-	drawMarkers();
-	$("#speed").text("Current Speed: "+speed);
-	startWorms();
+class Worm {
+	constructor(color) {
+		this.color = color;
+		this.x;
+		this.y;
+		this.previousX = new Array(histotyDotsSaved);
+		this.previousY = new Array(histotyDotsSaved);
+		this.previousHole = new Array(histotyDotsSaved);
+		this.angle;
+		this.alive = true;
+		this.playing = false;
+		this.score = 0;
+		this.length = 0;
+		this.lastHoleStarted = 0;
+	}
 }
 
 // Start each individual Worm
 function startWorms() {
-	for(var i = 0; i < colors.length; i++) {
-		if(players[i]) startWorm(colors[i]);
-	}
+	for(var i = 0; i < colors.length; i++) if(players[i]) startWorm(colors[i]);
 	drawScore();
 }
 
@@ -178,24 +188,17 @@ function startWorms() {
 function startWorm(color) {
 	// TODO: Limit the place and border proximity to avoid fast death
 	// Getting Random Postitions and Angle
-	x = Math.floor(Math.random()*xMax);
-	y = Math.floor(Math.random()*yMax);
-	angle = Math.floor(Math.random()*angleMax);
 	i = getWormIndexByColor(color);
 
-	if(!isNewRound)
-	{
-		worms[i] = new worm;
-		worms[i].score = 0;
-	}
+	if(!isNewRound) worms[i].score = 0;
 		
-	worms[i].x = x;
-	worms[i].y = y;
-	worms[i].angle = angle;
+	worms[i].x = Math.floor(Math.random()*xMax);
+	worms[i].y = Math.floor(Math.random()*yMax);
+	worms[i].angle = Math.floor(Math.random()*angleMax);
 	worms[i].color = color;
 	worms[i].alive = true;
 	worms[i].playing = true;
-	worms[i].length = 0; //31;
+	worms[i].length = 0;
 	
 	drawWorm(worms[i]);
 }
@@ -205,10 +208,8 @@ function getLongestWorm() {
 	longestWormSize = 0;
 	longestWorm = "";
 	
-	for(var i = 0; i < worms.length; i++)
-	{
-		if(players[i])
-		{
+	for(var i = 0; i < worms.length; i++) {
+		if(players[i]) {
 			//alert(i+" "+worms[i].length+" "+longestWormSize);
 			if(worms[i].length >= longestWormSize)
 			{
@@ -222,7 +223,7 @@ function getLongestWorm() {
 
 // Set Time interval (must not exists any more when render will be implemented)
 function changeInterval(speed) {
-	fps = speed+basicFPSValue;
+	fps = speed + basicFPSValue;
 	clearInterval(interval);
 	interval = setInterval(moveWorms, intervalMiliSeconds/fps);
 }
@@ -232,27 +233,24 @@ function doSpeeding() {
 	playSound("speeding");
 	speed += speedingIncrementSpeed;
 	changeInterval(speed);
-	addMessage("Current Speed: "+(speed), "speed");
+	addMessage("Current Speed: " + (speed), "speed");
 }
 
 // This function evaluates and if random numbers matchs speeds
 function speeding() {
 	random_1 = Math.floor(Math.random()*(speedingChance+speed));
 	random_2 = (speedingChance+speed) - Math.floor(Math.random()*(speedingChance+speed));
-	if(random_1 == random_2)
-		doSpeeding();
+	if(random_1 == random_2) doSpeeding();
 }
 
 // This function move each worm and is called in the time interval
 function moveWorms() {
-	if(onPause)
-		return;
+	if(onPause) return;
 	
 	speeding();
 	modifyWormsAngle();
 	
-	for(var i = 0; i < colors.length; i++)
-	{
+	for(var i = 0; i < colors.length; i++) {
 		if(players[i] && worms[i].alive)
 			moveWorm(worms[i]);
 	}
@@ -260,44 +258,35 @@ function moveWorms() {
 
 // Add the score to all non dead worms
 function addScore() {
-	for(var i = 0; i < worms.length; i++)
-	{
-		if(players[i] && worms[i].alive)
-			worms[i].score++;
+	for(var i = 0; i < worms.length; i++) {
+		if(players[i] && worms[i].alive) worms[i].score++;
 	}
 }
 
 // Determines wich worms are alive
 function getWormsAlive() {
 	wormsAlive = 0;
-	for(var i = 0; i < worms.length; i++)
-	{
-		if(players[i] && worms[i].alive)
-			wormsAlive++;
+	for(var i = 0; i < worms.length; i++) {
+		if(players[i] && worms[i].alive) wormsAlive++;
 	}
 }
 
 // Get the highest Score and the Winning Worm
 function getMaxScore() {
 	maxScore = 0;
-	for(var i = 0; i < worms.length; i++)
-	{
-		if(players[i] && worms[i].score > maxScore)
-		{
+	for(var i = 0; i < worms.length; i++) {
+		if(players[i] && worms[i].score > maxScore) {
 			maxScore = worms[i].score;
 			winningWorm = i;
 		}
 	}
-	
 }
 
 // Get the score needed to win the match
 function getScoreToWin() {
 	scoreToWin = -10;
-	for(var i = 0; i < worms.length; i++)
-	{
-		if(players[i])
-			scoreToWin+=10;
+	for(var i = 0; i < worms.length; i++){
+		if(players[i]) scoreToWin+=10;
 	}
 }
 
@@ -314,25 +303,21 @@ function isWormHit(currentWorm) {
 	var redValue = imageArray.data[0];
 	var greenValue = imageArray.data[1];
 	var blueValue = imageArray.data[2];
-	var alphaValue = imageArray.data[3];
+	// var alphaValue = imageArray.data[3];
 	
-	if(redValue != 0 || greenValue != 0 || blueValue != 0)
-	{
+	if(redValue != 0 || greenValue != 0 || blueValue != 0) {
 		//showPixelInfo(currentWorm, imageArray);
-		if(redValue == 1 && greenValue == 1 && blueValue == 1)
-			playSound("yabass");
-		else
-			return true;
+		if(redValue == 1 && greenValue == 1 && blueValue == 1) playSound("yabass");
+		else return true;
 	}
 			
 	return false;
-	
 }
 
 // Stablish the current round
 function setRound() {
 	currentRound++;
-	addMessage("Current Round: "+currentRound, "rounds");
+	addMessage("Current Round: " + currentRound, "rounds");
 }
 
 // Huge function, move a worm, evaluate if the worm has crushed 
@@ -382,7 +367,6 @@ function wormCrushes(currentWorm) {
 	addMessage(message, "longest");
 	message = "Size: "+longestWormSize;  
 	addMessage(message, "longest_size");
-	
 }
 			
 // The last worm is dead, needs to start a new round and maybe a new match
@@ -417,11 +401,11 @@ function roundOver(currentWorm) {
 	else if(winningWorm == 2) 
 		playSound("green");
 	else if(winningWorm == 3) 
-		playSound("purple");
-	else if(winningWorm == 4) 
-		playSound("cyan");
-	else if(winningWorm == 5) 
 		playSound("yellow");
+	else if(winningWorm == 4) 
+		playSound("purple");
+	else if(winningWorm == 5) 
+		playSound("cyan");
 	start();
 }
 
@@ -431,21 +415,18 @@ function storePreviuosCoordinates(currentWorm) {
 	if(!currentWorm.previousX) return;
 	if(!currentWorm.previousY) return;
 
-	for(var i = histotyDotsSaved; i > 0; i--)
-	{
-		currentWorm.previousX[i] = currentWorm.previousX[i-1];
+	for(var i = histotyDotsSaved; i > 0; i--) {
+		currentWorm.previousX[i] = currentWorm.previousX[i-1]; 
 		currentWorm.previousY[i] = currentWorm.previousY[i-1];
 	}
 	currentWorm.previousX[0] = currentWorm.x;
 	currentWorm.previousY[0] = currentWorm.y;
-	
 }
 
 // Stablish if the worm should a hole
 function isHole(currentWorm) {
 	var module = currentWorm.length%(holeSize+spaceBetweenHoles);
-	if(module <= holeSize)
-		return true;
+	if(module <= holeSize) return true;
 	return false;
 }
 
@@ -461,13 +442,13 @@ function getWormIndexByColor(color) {
 		case "green":
 			return 2;
 			break;
-		case "purple":
+		case "yellow":
 			return 3;
 			break;
-		case "cyan":
+		case "purple":
 			return 4;
 			break;
-		case "yellow":
+		case "cyan":
 			return 5;
 			break;
 		default:
@@ -479,29 +460,10 @@ function getWormIndexByColor(color) {
 // This function adds a message to different textareas
 function addMessage(message, id) {
 	$("#" + id).val(message);
-
-	// switch (id) {
-	// 	case "howto":
-	// 		$("#howto").text(message);
-	// 		break;
-	// 	case "speed":
-	// 		$("#speed").val(message);
-	// 		break;
-	// 	case "rounds":
-	// 		$("#rounds").val(message);	
-	// 		break;
-	// 	case "longest":
-	// 		$("#longest").val(message);
-	// 		break;
-	// 	case "longest_size":
-	// 		$("#longest_size").val(message);
-	// 		break;
-	// }
 }
 
 // This function shows the current worm info
-function showWormInfo(currentWorm)
-{
+function showWormInfo(currentWorm) {
 	alert(	"color: "+currentWorm.color+
 			"\nx: "+currentWorm.x+
 			"\ny: "+currentWorm.y+
@@ -513,8 +475,7 @@ function showWormInfo(currentWorm)
 }  
 
 // This function shows the information related with the selected picture
-function showPixelInfo(currentWorm, imageArray)
-{
+function showPixelInfo(currentWorm, imageArray) {
 	alert(	"current.x: "+currentWorm.x+
 			"\ncurrent.y: "+currentWorm.y+
 			"\nnext.x: "+x+
@@ -527,13 +488,10 @@ function showPixelInfo(currentWorm, imageArray)
 } 
 
 // Render Screen: This function draws all
-function renderScreen()
-{
+function renderScreen() {
 	// draw canvas
-	for(var i = 0; i < worms.length; i++)
-	{
-		if(players[i] && worms[i].score > maxScore)
-		{
+	for(var i = 0; i < worms.length; i++) {
+		if(players[i] && worms[i].score > maxScore) {
 			renderWorm(worms[i]);
 			//maxScore = worms[i].score;
 		}
@@ -541,14 +499,11 @@ function renderScreen()
 }
 
 // Render Worm: This function render one specific worm
-function renderWorm(currentWorm)
-{
+function renderWorm(currentWorm) {
 	context.fillStyle = currentWorm.color;
 	
-	for(var i = 0; i < currentWorm.lenght; i++)
-	{
-		if(currentWorm.previousHole[i])
-		{
+	for(var i = 0; i < currentWorm.lenght; i++) {
+		if(currentWorm.previousHole[i]) {
 			//setColor...
 			context.fillStyle = "rgb(2, 2, 2)";
 		}
@@ -577,8 +532,6 @@ function renderWorm(currentWorm)
 	}
 	
 	//currentWorm.length++;
-	
-	
 }
 
 //Pause Function 
@@ -593,7 +546,5 @@ function pause(setCheckbox = false) {
 	$("#pause_label").text(pauseText);
 	addToLog(pauseText);
 
-	if(setCheckbox) {
-		$('#flexCheckCheckedPause').prop('checked', onPause);
-	}
+	if(setCheckbox) $('#flexCheckCheckedPause').prop('checked', onPause);
 }

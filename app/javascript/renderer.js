@@ -1,16 +1,16 @@
 /**
  * Defining the global variables
  */
-var playingWorms;
+var playingWorms = {};
 var playingWormsObjetcs = new Array();
 var currentWorm;
 
 var wormRed;
 var wormBlue;
 var wormGreen;
+var wormYellow;
 var wormPurple;
 var wormCyan;
-var wormYellow;
 
 var plusWidth = 3;
 var plusDensity = 1;
@@ -20,8 +20,7 @@ var plusDensity = 1;
  * This method returns the Playing worms
  * TODO: remove the hardcoded and get it from the configuration
  */
-function getPlayingWorms()
-{
+function getPlayingWorms() {
 	playingWorms = {
 		'red'	: true,
 		'blue'	: false,
@@ -37,8 +36,7 @@ function getPlayingWorms()
  * Setup for all the worms
  * @param color
  */
-function setupWorms()
-{
+function setupWorms() {
 	var playingWorms = getPlayingWorms();
 	$.each(playingWorms, function(color, active){
 
@@ -76,8 +74,7 @@ function setupWorms()
  *
  * @param color
  */
-function setupWorm(color)
-{
+function setupWorm(color) {
 	currentWorm = new worm(color);
 	return currentWorm;
 }
@@ -86,8 +83,7 @@ function setupWorm(color)
  * Defining the worm historical previous steps
  * Every Position is a pixel
  */
-function wormPosition()
-{
+function wormPosition() {
 	this.movementId; 		// Movement Identification (PK)
 	this.wormColor;			// The Worm Color (A letter maybe)
 	this.isHole;			// Boolean Determines if have to print
@@ -102,22 +98,20 @@ function wormPosition()
  * Get the worm that is represented by the color
  * @param color
  */
-function getWormByColor(color)
-{
-	switch(color)
-	{
+function getWormByColor(color) {
+	switch(color) {
 		case "red":
 			currentWorm = wormRed;
 		case "blue":
 			currentWorm = wormBlue;
 		case "green":
 			currentWorm = wormGreen;
+		case "yellow":
+			currentWorm = wormYellow;
 		case "purple":
 			currentWorm = wormPurple;
 		case "cyan":
 			currentWorm = wormCyan;
-		case "yellow":
-			currentWorm = wormYellow;
 	}
 	return currentWorm;
 }
@@ -126,8 +120,7 @@ function getWormByColor(color)
  * Store the current position to the historical array
  * @param color
  */
-function moveCurrentPositionToHistorical(color)
-{
+function moveCurrentPositionToHistorical(color) {
 	var currentWorm = getWormByColor(color);
 	currentWorm.historicalMoves.push(currentWorm.currentMove);
 }
@@ -136,8 +129,7 @@ function moveCurrentPositionToHistorical(color)
  * Amount of movements made by that color worm
  * @param color
  */
-function getRoundPositionsByColor(color)
-{
+function getRoundPositionsByColor(color) {
 	var currentWorm = getWormByColor(color);
 	return currentWorm.historicalMoves.length();
 }
@@ -145,8 +137,7 @@ function getRoundPositionsByColor(color)
 /**
  * Worm Object definition structure
  */
-function worm(color)
-{
+function worm(color) {
 	// Atributes
 	this.color = color;
 	this.currentMove;
@@ -160,7 +151,6 @@ function worm(color)
 
 	// Methods
 	this.drawWorm = drawWorm;
-
 }
 
 /*
@@ -170,18 +160,14 @@ worm.prototype.drawWorm = function() {
 */
 
 
-function drawCanvas()
-{
+function drawCanvas() {
 	/**
 	 * TODO: Create the empty canvas
 	 */
-
 }
 
-function drawWormPosition(position)
-{
-	if(!position.isHole)
-	{
+function drawWormPosition(position) {
+	if(!position.isHole) {
 
 		context.beginPath();
 		context.fillStyle = position.wormColor
@@ -216,8 +202,7 @@ function drawWormPosition(position)
 	}
 }
 
-function drawWorm(color)
-{
+function drawWorm(color) {
 	/**
 	 * TODO: Create the complete worm
 	 */
@@ -268,8 +253,7 @@ function drawWorm(color)
 	*/
 }
 
-function playTurn()
-{
+function playTurn() {
 	// Draw Canvas and Score
 	var playingWorms = getPlayingWorms();
 	$.each(playingWorms, function(color, active){
@@ -280,11 +264,9 @@ function playTurn()
 /**
  *
  */
-function drawMarkers()
-{
+function drawMarkers() {
 	yMarker = 0;
-	for(var i = 0; i < colors.length; i++)
-	{
+	for(var i = 0; i < colors.length; i++) {
 		drawMarker(colors[i], xMarker, yMarker, wMarker, hMarker);
 		yMarker += yMax/6;
 	}
@@ -323,40 +305,33 @@ function drawScore()
 }
 */
 
-function getPixelColor(x, y, w, h)
-{
+function getPixelColor(x, y, w, h) {
 	var gi = context.getImageData(x, y, w, h);
 	alert("red: "+gi.data[0]+"\ngreen: "+gi.data[1]+"\nblue: "+gi.data[2]+"\nalpha: "+gi.data[3]);
 }
 
-function setGameAreaProperties()
-{
+function setGameAreaProperties() {
 	context.font = '36px arial';
 	context.textAlign = 'left';
 	context.textBaseline = 'middle';
 	context.fillStyle = "rgb(0,0,0)";
 }
 
-function setMarkerProperties()
-{
+function setMarkerProperties() {
 	marker.fillStyle = "white";
 	marker.font = '48px arial';
 	marker.textAlign = 'left';
 	marker.textBaseline = 'middle';
 }
 
-function loadGameAreaContext()
-{
+function loadGameAreaContext() {
 	context = $("#screen")[0].getContext('2d');
-	if(context)
-		return context;
+	if(context) return context;
 	return false;
 }
 
-function loadMarkerCanvas()
-{
+function loadMarkerCanvas() {
 	marker = $("#marker")[0].getContext('2d');
-	if(marker)
-		return marker;
+	if(marker) return marker;
 	return false;
 }

@@ -1,6 +1,4 @@
 
-
-
 /**
  * Starting the Game when page is Ready
  */
@@ -154,8 +152,7 @@ function getPlayingWorms () {
  * Setup for all the worms
  * @param color
  */
-function setupWorms()
-{
+function setupWorms() {
 	var playingWorms = getPlayingWorms();
 	$.each(playingWorms, function(index, worm) {
 		if(worm.active) {

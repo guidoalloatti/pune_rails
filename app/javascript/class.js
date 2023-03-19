@@ -7,7 +7,6 @@ Match = function () {
 	fields['players'] = 0;
 }
 
-
 ScoreArea = function () {
 	var scoreArea;
 	return {
@@ -55,7 +54,6 @@ ScoreArea = function () {
 	}
 }
 
-
 GameArea = function () {
 	var gameArea;
 	return {
@@ -73,7 +71,6 @@ GameArea = function () {
 		}
 	}
 }
-
 
 Worm = function (color) {
 	// Class Atributes
@@ -199,7 +196,6 @@ var WormPosition = function (params) {
 		}
 	}
 }
-
 
 NextWormPosition = function(worm) {
 	var fields = new Array();
