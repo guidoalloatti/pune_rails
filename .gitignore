@@ -60,3 +60,5 @@ build-iPhoneSimulator/
 /config/master.key
 /log/development.log
 log/development.log
+development.log
+server.pid
