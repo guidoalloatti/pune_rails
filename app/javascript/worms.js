@@ -7,12 +7,12 @@ var colorsArray = ["red", "blue", "green", "yellow", "purple", "cyan"];
 var playingWorms = {};
 var currentWorm;
 
-var wormRed;
-var wormBlue;
-var wormGreen;
-var wormYellow;
-var wormPurple;
-var wormCyan;
+// var wormRed;
+// var wormBlue;
+// var wormGreen;
+// var wormYellow;
+// var wormPurple;
+// var wormCyan;
 
 /**
  * Starting the Game when page is Ready
@@ -91,10 +91,15 @@ function setArrays(data) {
 
 	// Set Worms Array and Keys
 	for(var i = 0; i < worms.length; i++) {
-		if(players[i]) { 
-			worms[i] = new Worm(colors[i]);
-			wormsKeys[colors[i]]['left'] = keyMapping[data[colors[i] + "_left"]];
-			wormsKeys[colors[i]]['right'] = keyMapping[data[colors[i] + "_right"]];
+		if(players[i]) {
+			var worm = new Worm(colors[i]);
+			worm["left"] = data[colors[i] + "_left"];
+			worm["right"] = data[colors[i] + "_right"];
+			
+			worm["leftKeyCode"] = keyMapping[data[colors[i] + "_left"]];
+			worm["rightKeyCode"] = keyMapping[data[colors[i] + "_right"]];
+			
+			worms[i] = worm;
 		}
 	}
 
@@ -175,6 +180,10 @@ class Worm {
 		this.score = 0;
 		this.length = 0;
 		this.lastHoleStarted = 0;
+		this.left;
+		this.right;
+		this.leftKeyCode;
+		this.rightKeyCode;
 	}
 }
 
